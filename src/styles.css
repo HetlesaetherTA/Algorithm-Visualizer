@@ -1,0 +1,31 @@
+body,
+html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#app {
+  height: 300px;
+  width: 100%;
+  border: 1px solid black; /* Add border to make it visible */
+  display: flex;
+  flex-direction: row; /* Ensure the items are in a row */
+  flex-wrap: nowrap; /* Prevent wrapping */
+  justify-content: center; /* Center the items horizontally */
+  align-items: flex-end; /* Align items to the bottom */
+}
+
+#app * {
+  background: red;
+  height: 100px;
+  width: 100px;
+  margin: 5px; /* Add some spacing between divs */
+}
+
+#div1 {
+  background: blue;
+}
