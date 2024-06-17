@@ -10,7 +10,7 @@ html {
 
 #app {
   height: 300px;
-  width: 100%;
+  width: 400px;
   border: 1px solid black; /* Add border to make it visible */
   display: flex;
   flex-direction: row; /* Ensure the items are in a row */
@@ -22,8 +22,14 @@ html {
 #app * {
   background: red;
   height: 100px;
-  width: 100px;
   margin: 5px; /* Add some spacing between divs */
+}
+
+#sort {
+  height: 20px;
+  background: none;
+  position: absolute;
+  top: 0;
 }
 
 #div1 {
