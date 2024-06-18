@@ -37,6 +37,24 @@
           app.appendChild(div);
         }
       }
+
+      function sort(data) {
+        const heap = newHeap()
+        let sortedArray = []
+
+        for (i=0;i<data.length;i++) {
+          heap.append(data[i])
+        }
+        let temp = heap.getArray()
+        draw(heap.getArray())
+
+        sortedArray.unshift(90)
+        heap.swap(0, temp.length - 1)
+        heap.removeLast()
+        temp = heap.getArray()
+        console.log(temp, " + ", sortedArray)
+        draw(temp.concat(sortedArray))
+      }
       document.getElementById('sort').onclick = () => sort(arr);
     </script>
   </body>

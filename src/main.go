@@ -62,6 +62,8 @@ func temp(this js.Value, p []js.Value) interface{} {
 	return jsArray
 }
 
+// Return value 0 = no change made, already sorted
+// Return vale 1 = change made, array not sorted
 func sort(this js.Value, p []js.Value) interface{} {
 	jsArray := p[0]
 	h := &MaxHeap{}
@@ -73,25 +75,20 @@ func sort(this js.Value, p []js.Value) interface{} {
 	itr := 0
 	var returnValue []int
 
-	for {
-		if len(h.array) != 1 {
-			h.swap(0, len(h.array)-1)
-			returnValue = append([]int{h.array[len(h.array)-1]}, returnValue...)
-			h.array = h.array[:len(h.array)-1]
-			draw([]int{4, 5, 3, 2, 40, 60, 50, 70, 20, 90, 10, 40})
+	if len(h.array) != 1 {
+		h.swap(0, len(h.array)-1)
+		returnValue = append([]int{h.array[len(h.array)-1]}, returnValue...)
+		h.array = h.array[:len(h.array)-1]
 
-			h.heapifyDown(0)
-			time.Sleep(500 * time.Millisecond)
-			fmt.Println(itr, ": ", h.array, " + ", returnValue)
-			itr++
-		} else {
-			break
-		}
+		h.heapifyDown(0)
+		time.Sleep(500 * time.Millisecond)
+		fmt.Println(itr, ": ", h.array, " + ", returnValue)
+		itr++
+	} else {
+		return 1
 	}
 
 	fmt.Println("done: ", append(h.array, returnValue...))
-
-	draw(append(h.array, returnValue...))
 
 	for i, val := range returnValue {
 		jsArray.SetIndex(i, val)
@@ -100,20 +97,48 @@ func sort(this js.Value, p []js.Value) interface{} {
 	return jsArray
 }
 
-func draw(arr []int) {
-	val := js.Global().Get("Array").New(len(arr))
-	for i, v := range arr {
-		val.SetIndex(i, js.ValueOf(v))
-	}
-	js.Global().Call("draw", val)
+func (h *MaxHeap) appendJs(this js.Value, p []js.Value) interface{} {
+	h.append(p[0].Int())
+	return nil
 }
 
-func registerCallbacks() {
-	js.Global().Set("sort", js.FuncOf(sort))
+func (h *MaxHeap) heapifyDownJs(this js.Value, p []js.Value) interface{} {
+	h.heapifyDown(p[0].Int())
+	return nil
+}
+
+func (h *MaxHeap) swapJs(this js.Value, p []js.Value) interface{} {
+	fmt.Println(p[0].Int(), " swapped with ", p[1].Int())
+	h.swap(p[0].Int(), p[1].Int())
+	return nil
+}
+
+func (h *MaxHeap) removeLastJs(this js.Value, p []js.Value) interface{} {
+	h.array = h.array[:len(h.array)-1]
+	return nil
+}
+
+func (h *MaxHeap) getArrayJs(this js.Value, p []js.Value) interface{} {
+	arr := js.Global().Get("Array").New(len(h.array))
+	for i, v := range h.array {
+		arr.SetIndex(i, js.ValueOf(v))
+	}
+	return arr
+}
+
+func newHeap(this js.Value, p []js.Value) interface{} {
+	h := &MaxHeap{}
+	return js.ValueOf(map[string]interface{}{
+		"append":      js.FuncOf(h.appendJs),
+		"heapifyDown": js.FuncOf(h.heapifyDownJs),
+		"swap":        js.FuncOf(h.swapJs),
+		"getArray":    js.FuncOf(h.getArrayJs),
+		"removeLast":  js.FuncOf(h.removeLastJs),
+	})
 }
 
 func main() {
 	c := make(chan struct{}, 0)
-	registerCallbacks()
+	js.Global().Set("newHeap", js.FuncOf(newHeap))
 	<-c
 }
